@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title id="app-title-tag">LuxHub Ultra | Premium Digital Assets</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #8b5cf6; 
+            --primary-dark: #6d28d9;
+            --accent: #00f2ff;
+            --bg: #05070a;
+            --card-bg: #11141b;
+            --glass: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-main: #ffffff;
+            --text-dim: #94a3b8;
+            --safe-top: env(safe-area-inset-top);
+            --safe-bottom: env(safe-area-inset-bottom);
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'Outfit', sans-serif; }
+        body { margin: 0; background-color: var(--bg); color: var(--text-main); overflow-x: hidden; padding-top: var(--safe-top); }
+
+        header { padding: 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; background: rgba(5, 7, 10, 0.8); backdrop-filter: blur(20px); z-index: 1000; border-bottom: 1px solid var(--glass-border); }
+        .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 1.4rem; letter-spacing: -1px; background: linear-gradient(to right, #fff, var(--text-dim)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+        .spotlight { padding: 20px; margin-bottom: 10px; }
+        .spotlight-card { width: 100%; height: 200px; border-radius: 24px; background: linear-gradient(to bottom, transparent, rgba(0,0,0,0.8)), url('https://images.unsplash.com/photo-1614850523296-d8c1af93d400?w=800'); background-size: cover; background-position: center; display: flex; flex-direction: column; justify-content: flex-end; padding: 20px; border: 1px solid var(--glass-border); position: relative; overflow: hidden; }
+
+        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; padding: 20px; }
+        .card { background: var(--card-bg); border-radius: 22px; border: 1px solid var(--glass-border); padding: 8px; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); position: relative; }
+        .card:active { transform: scale(0.95); background: #1a1f29; }
+        .card-img { width: 100%; aspect-ratio: 1; border-radius: 16px; object-fit: cover; margin-bottom: 10px; }
+        .card-meta { padding: 0 8px 8px; }
+        .card-title { font-weight: 600; font-size: 0.9rem; margin-bottom: 4px; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
+        .card-cat { font-size: 0.7rem; color: var(--primary); font-weight: 700; text-transform: uppercase; }
+
+        .btn { border: none; border-radius: 14px; padding: 12px 20px; font-weight: 700; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s; width: 100%; }
+        .btn-premium { background: linear-gradient(135deg, var(--primary), #a855f7); color: white; box-shadow: 0 10px 20px -5px rgba(139, 92, 246, 0.5); }
+        .btn-glass { background: var(--glass); border: 1px solid var(--glass-border); color: white; backdrop-filter: blur(10px); }
+
+        .sheet-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); z-index: 2000; display: none; align-items: flex-end; }
+        .sheet { background: #0f1218; width: 100%; border-radius: 32px 32px 0 0; padding: 30px 20px calc(30px + var(--safe-bottom)); transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); border-top: 1px solid var(--glass-border); }
+        .sheet.active { transform: translateY(0); }
+        .drag-handle { width: 40px; height: 4px; background: var(--glass-border); border-radius: 10px; margin: -15px auto 20px; }
+
+        .nav { position: fixed; bottom: 20px; left: 20px; right: 20px; height: 70px; background: rgba(17, 20, 27, 0.9); backdrop-filter: blur(20px); border-radius: 24px; border: 1px solid var(--glass-border); display: flex; justify-content: space-around; align-items: center; z-index: 1500; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-dim); font-size: 0.65rem; font-weight: 600; }
+        .nav-item.active { color: var(--accent); }
+
+        .screen { display: none; padding-bottom: 100px; }
+        .screen.active { display: block; animation: fadeIn 0.4s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .toast { position: fixed; top: calc(20px + var(--safe-top)); left: 50%; transform: translateX(-50%); background: var(--card-bg); border: 1px solid var(--primary); padding: 12px 24px; border-radius: 50px; z-index: 3000; display: none; font-weight: 600; }
+    </style>
+</head>
+<body>
+
+    <div id="toast" class="toast"></div>
+
+    <header>
+        <div class="brand" id="app-brand-name">
+            <i data-lucide="diamond" style="color:var(--primary)"></i>
+            LUXHUB ULTRA
+        </div>
+        <div class="badge-count" id="tier-badge" style="background:var(--primary); padding:2px 8px; border-radius:6px; font-size:0.7rem;">SILVER TIER</div>
+    </header>
+
+    <main id="content-mount">
+        <section id="scr-home" class="screen active">
+            <div class="spotlight">
+                <div class="spotlight-card" id="hero-card">
+                    <div style="font-size: 0.7rem; font-weight: 800; color: var(--accent);">LATEST RELEASE</div>
+                    <div style="font-size: 1.5rem; font-weight: 800;" id="hero-title">Loading Assets...</div>
+                </div>
+            </div>
+            <div style="padding: 0 20px; font-weight: 800; font-size: 1.2rem;">All Collections</div>
+            <div class="grid" id="main-grid"></div>
+        </section>
+
+        <section id="scr-cats" class="screen">
+            <div style="padding: 20px; display: flex; gap: 10px; overflow-x: auto;" id="filter-bar"></div>
+            <div class="grid" id="cat-grid"></div>
+        </section>
+
+        <section id="scr-search" class="screen">
+            <div style="padding: 20px;">
+                <input type="text" id="search-box" placeholder="Search assets..." 
+                    style="width:100%; padding:18px 25px; border-radius:18px; border:1px solid var(--glass-border); background:var(--card-bg); color:#fff; outline: none;">
+            </div>
+            <div class="grid" id="search-grid"></div>
+        </section>
+
+        <section id="scr-profile" class="screen">
+            <div style="padding: 30px 20px; text-align: center;">
+                <div style="width:90px; height:90px; border: 3px solid var(--primary); border-radius: 50%; margin: 0 auto 20px; padding: 5px;">
+                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Lucky" style="width:100%; height:100%; border-radius:50%; background: #1a1f29;">
+                </div>
+                <h2 id="prof-id" style="margin:0">User</h2>
+                
+                <div id="sys-msg-container" style="background: var(--glass); padding: 10px; border-radius: 12px; margin-top: 20px; border: 1px solid var(--primary); display: none;">
+                    <small style="color: var(--primary); font-weight: 800;">SYSTEM MESSAGE</small>
+                    <p id="sys-msg-text" style="font-size: 0.8rem; margin: 5px 0 0;"></p>
+                </div>
+
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 30px;">
+                    <div class="card">
+                        <small style="color:var(--text-dim)">Unlocked</small>
+                        <div style="font-size: 1.5rem; font-weight: 800;" id="stat-count">0</div>
+                    </div>
+                    <div class="card">
+                        <small style="color:var(--text-dim)">Level</small>
+                        <div style="font-size: 1.5rem; font-weight: 800;">Lv. 1</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div class="sheet-overlay" id="sheet-overlay" onclick="closeSheet()">
+        <div class="sheet" id="detail-sheet" onclick="event.stopPropagation()">
+            <div class="drag-handle"></div>
+            <div id="sheet-content"></div>
+        </div>
+    </div>
+
+    <nav class="nav">
+        <div class="nav-item active" onclick="showScreen('home', this)"><i data-lucide="home"></i><span>Home</span></div>
+        <div class="nav-item" onclick="showScreen('cats', this)"><i data-lucide="layers"></i><span>Browse</span></div>
+        <div class="nav-item" onclick="showScreen('search', this)"><i data-lucide="search"></i><span>Search</span></div>
+        <div class="nav-item" onclick="showScreen('profile', this)"><i data-lucide="user"></i><span>Profile</span></div>
+    </nav>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDu5BcgSz22f_nJpZgDplI0fiRjmdsCwmE",
+            authDomain: "luxhub-ultra.firebaseapp.com",
+            databaseURL: "https://luxhub-ultra-default-rtdb.firebaseio.com",
+            projectId: "luxhub-ultra",
+            storageBucket: "luxhub-ultra.firebasestorage.app",
+            messagingSenderId: "517833249293",
+            appId: "1:517833249293:android:ece8e2fdd202be1b0a7b44"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        window.state = {
+            unlocked: JSON.parse(localStorage.getItem('unlocked_map')) || {},
+            full: JSON.parse(localStorage.getItem('full_list')) || [],
+            uid: localStorage.getItem('user_id') || "UX-" + Math.floor(Math.random()*9999)
+        };
+
+        window.CONTENT = [];
+
+        // Load Content from Firebase
+        const contentRef = ref(db, 'contents');
+        onValue(contentRef, (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                window.CONTENT = Object.keys(data).map(key => ({
+                    firebaseId: key,
+                    ...data[key]
+                }));
+                
+                // Update Hero Section
+                if (window.CONTENT.length > 0) {
+                    const latest = window.CONTENT[window.CONTENT.length - 1];
+                    document.getElementById('hero-title').innerText = latest.title;
+                    document.getElementById('hero-card').style.backgroundImage = `linear-gradient(to bottom, transparent, rgba(0,0,0,0.8)), url('${latest.img}')`;
+                }
+                
+                renderGrid(window.CONTENT, 'main-grid');
+                renderGrid(window.CONTENT, 'cat-grid');
+            }
+        });
+
+        // Load System Message
+        onValue(ref(db, 'system/message'), (snapshot) => {
+            const msg = snapshot.val();
+            if (msg && msg.text) {
+                document.getElementById('sys-msg-container').style.display = 'block';
+                document.getElementById('sys-msg-text').innerText = msg.text;
+            }
+        });
+
+        // Search logic
+        document.getElementById('search-box').oninput = (e) => {
+            const results = window.CONTENT.filter(i => i.title.toLowerCase().includes(e.target.value.toLowerCase()));
+            renderGrid(results, 'search-grid');
+        };
+
+        // Initialize App
+        window.onload = () => {
+            setupFilters();
+            updateUI();
+            lucide.createIcons();
+        };
+
+        function renderGrid(items, containerId) {
+            const container = document.getElementById(containerId);
+            if(!container) return;
+            container.innerHTML = items.map(item => {
+                const isFull = window.state.full.includes(item.id);
+                const progress = window.state.unlocked[item.id] || 0;
+                return `
+                    <div class="card" onclick="openDetail(${item.id})">
+                        <img src="${item.img}" class="card-img" onerror="this.src='https://placehold.co/400x400/11141b/fff?text=No+Preview'">
+                        <div class="card-meta">
+                            <div class="card-cat">${item.cat}</div>
+                            <div class="card-title">${item.title}</div>
+                            <div style="font-size:0.65rem; color: ${isFull ? 'var(--accent)' : 'var(--text-dim)'}">
+                                ${isFull ? '<i data-lucide="check-check" size="12"></i> Ready' : `Unlock: ${progress}/${item.ads || 3}`}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            lucide.createIcons();
+        }
+        window.renderGrid = renderGrid;
+
+        function openDetail(id) {
+            const item = window.CONTENT.find(i => i.id == id);
+            if (!item) return;
+            const isFull = window.state.full.includes(id);
+            const progress = window.state.unlocked[id] || 0;
+            const reqAds = parseInt(item.ads) || 3;
+
+            const html = `
+                <div style="display:flex; gap:20px; align-items:center; margin-bottom:20px;">
+                    <img src="${item.img}" style="width:100px; height:100px; border-radius:20px; object-fit:cover;">
+                    <div>
+                        <div class="card-cat">${item.cat}</div>
+                        <h2 style="margin:0; font-size:1.4rem;">${item.title}</h2>
+                    </div>
+                </div>
+                <p style="color:var(--text-dim); line-height:1.6; font-size:0.9rem; margin-bottom:25px;">Premium asset uploaded via Titan Admin.</p>
+                
+                ${isFull ? `
+                    <button class="btn btn-premium" onclick="window.open('${item.link}', '_blank')">
+                        <i data-lucide="external-link"></i> ACCESS NOW
+                    </button>
+                ` : `
+                    <div style="margin-bottom:20px;">
+                        <div style="display:flex; justify-content:space-between; font-size:0.8rem; margin-bottom:8px;">
+                            <span>Unlock Progress</span>
+                            <span>${progress} / ${reqAds} Ads</span>
+                        </div>
+                        <div style="height:8px; background:var(--glass); border-radius:10px; overflow:hidden;">
+                            <div style="width:${(progress/reqAds)*100}%; height:100%; background:var(--primary); transition:0.3s;"></div>
+                        </div>
+                    </div>
+                    <button class="btn btn-premium" onclick="handleAd(${item.id})">
+                        <i data-lucide="play-circle"></i> WATCH AD TO UNLOCK
+                    </button>
+                `}
+            `;
+            document.getElementById('sheet-content').innerHTML = html;
+            document.getElementById('sheet-overlay').style.display = 'flex';
+            setTimeout(() => document.getElementById('detail-sheet').classList.add('active'), 10);
+            lucide.createIcons();
+        }
+        window.openDetail = openDetail;
+
+        function handleAd(id) {
+            const item = window.CONTENT.find(i => i.id == id);
+            const reqAds = parseInt(item.ads) || 3;
+            
+            // Simulating Ad - Replace with your Ad Link
+            window.open('https://www.highcpmgate.com/example-ad-link', '_blank');
+            
+            window.state.unlocked[id] = (window.state.unlocked[id] || 0) + 1;
+            toast("Ad completed! Progress +1");
+
+            if(window.state.unlocked[id] >= reqAds) {
+                if(!window.state.full.includes(id)) window.state.full.push(id);
+                toast("🎉 Success! Item Unlocked");
+            }
+            
+            save();
+            openDetail(id);
+            renderGrid(window.CONTENT, 'main-grid');
+            updateUI();
+        }
+        window.handleAd = handleAd;
+
+    </script>
+
+    <script>
+        // UI & Navigation Logic
+        function toast(msg) {
+            const t = document.getElementById('toast');
+            t.innerText = msg;
+            t.style.display = 'block';
+            setTimeout(() => t.style.display = 'none', 2500);
+        }
+
+        function showScreen(id, el) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById('scr-'+id).classList.add('active');
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            el.classList.add('active');
+        }
+
+        function closeSheet() {
+            document.getElementById('detail-sheet').classList.remove('active');
+            setTimeout(() => document.getElementById('sheet-overlay').style.display = 'none', 300);
+        }
+
+        function setupFilters() {
+            const cats = ['All', 'Apps', 'Movies', 'Drama'];
+            document.getElementById('filter-bar').innerHTML = cats.map(c => 
+                `<div class="btn btn-glass" style="width:auto; padding:8px 20px; border-radius:30px; font-size:0.75rem;" onclick="filter('${c}')">${c}</div>`
+            ).join('');
+        }
+
+        function filter(c) {
+            const f = c === 'All' ? window.CONTENT : window.CONTENT.filter(i => i.cat === c);
+            window.renderGrid(f, 'cat-grid');
+        }
+
+        function updateUI() {
+            document.getElementById('prof-id').innerText = window.state.uid;
+            document.getElementById('stat-count').innerText = window.state.full.length;
+        }
+
+        function save() {
+            localStorage.setItem('unlocked_map', JSON.stringify(window.state.unlocked));
+            localStorage.setItem('full_list', JSON.stringify(window.state.full));
+        }
+    </script>
+</body>
+  </html>
