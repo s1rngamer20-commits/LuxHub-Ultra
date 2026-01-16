@@ -3,7 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title id="app-title-tag">LuxHub Ultra | Premium Digital Assets</title>
+    <title id="app-title-tag">LuxHub | Premium Digital Assets</title>
+    
+    <script src="https://pl28489087.effectivegatecpm.com/36/4a/50/364a50be51bc887649aa323ac0113cc2.js"></script>
+
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
@@ -65,7 +68,7 @@
     <header>
         <div class="brand" id="app-brand-name">
             <i data-lucide="diamond" style="color:var(--primary)"></i>
-            LUXHUB ULTRA
+            LUXHUB 
         </div>
         <div class="badge-count" id="tier-badge" style="background:var(--primary); padding:2px 8px; border-radius:6px; font-size:0.7rem;">SILVER TIER</div>
     </header>
@@ -242,7 +245,7 @@
                         <h2 style="margin:0; font-size:1.4rem;">${item.title}</h2>
                     </div>
                 </div>
-                <p style="color:var(--text-dim); line-height:1.6; font-size:0.9rem; margin-bottom:25px;">Premium asset uploaded via Titan Admin.</p>
+                <p style="color:var(--text-dim); line-height:1.6; font-size:0.9rem; margin-bottom:25px;">Premium asset.</p>
                 
                 ${isFull ? `
                     <button class="btn btn-premium" onclick="window.open('${item.link}', '_blank')">
@@ -271,14 +274,15 @@
         window.openDetail = openDetail;
 
         function handleAd(id) {
-            const item = window.CONTENT.find(i => i.id == id);
-            const reqAds = parseInt(item.ads) || 3;
-            
-            // Simulating Ad - Replace with your Ad Link
-            window.open('https://www.highcpmgate.com/example-ad-link', '_blank');
+            // Replace with your Adsterra Direct Link
+            const adLink = "https://www.highcpmgate.com/example-ad-link"; 
+            window.open(adLink, '_blank');
             
             window.state.unlocked[id] = (window.state.unlocked[id] || 0) + 1;
             toast("Ad completed! Progress +1");
+
+            const item = window.CONTENT.find(i => i.id == id);
+            const reqAds = parseInt(item.ads) || 3;
 
             if(window.state.unlocked[id] >= reqAds) {
                 if(!window.state.full.includes(id)) window.state.full.push(id);
@@ -292,10 +296,14 @@
         }
         window.handleAd = handleAd;
 
+        function save() {
+            localStorage.setItem('unlocked_map', JSON.stringify(window.state.unlocked));
+            localStorage.setItem('full_list', JSON.stringify(window.state.full));
+        }
+
     </script>
 
     <script>
-        // UI & Navigation Logic
         function toast(msg) {
             const t = document.getElementById('toast');
             t.innerText = msg;
@@ -305,7 +313,8 @@
 
         function showScreen(id, el) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById('scr-'+id).classList.add('active');
+            const target = document.getElementById('scr-'+id);
+            if(target) target.classList.add('active');
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             el.classList.add('active');
         }
@@ -328,14 +337,11 @@
         }
 
         function updateUI() {
-            document.getElementById('prof-id').innerText = window.state.uid;
-            document.getElementById('stat-count').innerText = window.state.full.length;
-        }
-
-        function save() {
-            localStorage.setItem('unlocked_map', JSON.stringify(window.state.unlocked));
-            localStorage.setItem('full_list', JSON.stringify(window.state.full));
+            if(window.state) {
+                document.getElementById('prof-id').innerText = window.state.uid;
+                document.getElementById('stat-count').innerText = window.state.full.length;
+            }
         }
     </script>
 </body>
-  </html>
+</html>
